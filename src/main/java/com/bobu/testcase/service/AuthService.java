@@ -1,6 +1,7 @@
 package com.bobu.testcase.service;
 
 import com.bobu.testcase.converter.LoginConverter;
+import com.bobu.testcase.model.User;
 import com.bobu.testcase.request.LoginRequest;
 import com.bobu.testcase.response.LoginResponse;
 import com.bobu.testcase.security.JwtUtil;
@@ -28,8 +29,9 @@ public class AuthService {
                         request.password());
         Authentication authenticate = authenticationManager.authenticate(token);
         System.out.println(authenticate.getName());
-        String userId= userService.findByEmail(authenticate.getName()).getId();
+        User user = userService.findByEmail(authenticate.getName());
+        String userId= user.getId();
 
-        return converter.convert(jwtUtil.generateToken(authenticate),userId);
+        return converter.convert(jwtUtil.generateToken(authenticate),userId,user.getRole());
     }
 }

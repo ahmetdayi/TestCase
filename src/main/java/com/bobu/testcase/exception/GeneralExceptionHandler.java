@@ -1,24 +1,12 @@
 package com.bobu.testcase.exception;
-import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.http.HttpHeaders;
+
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.lang.NonNull;
-
-
-import org.springframework.validation.FieldError;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 @RestControllerAdvice
 public class GeneralExceptionHandler {
@@ -31,7 +19,7 @@ public class GeneralExceptionHandler {
         if (ex instanceof MethodArgumentNotValidException) {
 
             ((MethodArgumentNotValidException) ex).getAllErrors().forEach(err ->  errors.put("message" ,err.getDefaultMessage()));
-
+            System.out.println(ex);
         } else if (ex instanceof AlreadyExistException) {
             status = HttpStatus.CONFLICT;
             errors.put("message", ex.getMessage());
@@ -42,7 +30,7 @@ public class GeneralExceptionHandler {
             status = HttpStatus.BAD_REQUEST;
             errors.put("message", ex.getMessage());
         } else {
-            errors.put("message", "Internal Server Error");
+            errors.put("message", ex.getMessage());
         }
 
         return new ResponseEntity<>(errors, status);

@@ -1,7 +1,7 @@
 package com.bobu.testcase.controller;
 
-import com.bobu.testcase.request.CreateChildRequest;
 import com.bobu.testcase.request.CreateSubscribeRequest;
+import com.bobu.testcase.response.SubscribeResponse;
 import com.bobu.testcase.service.SubscribeService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,5 +24,9 @@ public class SubscribeController {
     public ResponseEntity<Void> delete(@PathVariable String id){
         subscribeService.delete(id);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+    @GetMapping("/findByUserId/{userId}")
+    public ResponseEntity<SubscribeResponse> findByUserId(@PathVariable String userId){
+        return new ResponseEntity<>(subscribeService.findByUserId(userId),HttpStatus.OK);
     }
 }

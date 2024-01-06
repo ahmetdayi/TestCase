@@ -9,14 +9,12 @@ import com.bobu.testcase.model.Parent;
 import com.bobu.testcase.model.Role;
 import com.bobu.testcase.repository.ChildRepository;
 import com.bobu.testcase.request.CreateChildRequest;
+import com.bobu.testcase.request.FindChildByParentsRequest;
 import com.bobu.testcase.request.UpdateChildRequest;
 import com.bobu.testcase.request.UpdateChild_ParentList_Request;
+import com.bobu.testcase.response.ChildResponse;
 import com.bobu.testcase.response.FindAllChildResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -63,25 +61,32 @@ public class ChildService {
         Child child = findById(request.id());
         child.setName(request.name().trim().isEmpty() ? child.getName() : request.name());
         child.setSurname(request.surname().trim().isEmpty() ? child.getSurname() : request.surname());
-        child.setPassword(
-                request.password().trim().isEmpty() ? child.getPassword() : bCryptPasswordEncoder.encode(request.password()));
-        child.setConfirmPassword(
-                request.confirmPassword().trim().isEmpty() ? child.getConfirmPassword() : bCryptPasswordEncoder.encode(request.confirmPassword()));
         childRepository.save(child);
 
     }
 
     public void updateParentList(UpdateChild_ParentList_Request request){
         Child child = findById(request.id());
-        List<Parent> parentList = parentService.findByInviteCode(request.parentList());
+        List<Boolean> list = child.getParentList().stream().map(parent -> request.parentList().stream().anyMatch(s -> parent.getInviteCode().equals(s))).toList();
+        boolean result = list.contains(true);
+        if (!result){
+            List<Parent> parentList = parentService.findByInviteCode(request.parentList());
 
-        child.getParentList().addAll(parentList);
-        childRepository.save(child);
+            child.getParentList().addAll(parentList);
+            childRepository.save(child);
+        }
+
+
     }
-    public Page<FindAllChildResponse> findAll(Integer size, Integer pageNumber){
-        Pageable pageable = PageRequest.of(pageNumber,size);
-        return childConverter.getAllConvert(childRepository.findAll(pageable));
+    public List<FindAllChildResponse> findAll(){
+        return childConverter.getAllConvert(childRepository.findAll());
 
+    }
+    public List<ChildResponse> findByParentList_IdIn(FindChildByParentsRequest request){
+        return childConverter.getConvert(childRepository.findByParentList_IdIn(request.parentIdList()));
+    }
+    public FindAllChildResponse getById(String id){
+        return childConverter.getAllConvert(findById(id));
     }
     private Child findById(String id){
         return childRepository.findById(id).orElseThrow(() -> new NotFoundException(Constant.NOT_FOUND));
