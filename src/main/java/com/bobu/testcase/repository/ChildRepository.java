@@ -9,6 +9,7 @@ import java.util.Optional;
 public interface ChildRepository extends JpaRepository<Child,String> {
     Optional<Child> findByEmail(String email);
     List<Child> findByParentList_IdIn(List<String> idList);
+    
 
 
 }

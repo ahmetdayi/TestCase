@@ -14,7 +14,7 @@ public class GeneralExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleException(Exception ex) {
         Map<String, Object> errors = new HashMap<>();
-        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        HttpStatus status = HttpStatus.BAD_REQUEST;
 
         if (ex instanceof MethodArgumentNotValidException) {
 
